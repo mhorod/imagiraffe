@@ -31,7 +31,7 @@ Color adjusted_color(Point p, const GiraffeGenerator& generator)
   return c;
 }
 
-int main()
+int main(int argc, char* argv[])
 {
   srand(time(NULL));
 
@@ -64,6 +64,6 @@ int main()
           adjusted_color({static_cast<int>(x), static_cast<int>(y)}, generator);
       image[y][x] = png::rgb_pixel(color.r, color.g, color.b);
     }
-  image.write("V.png");
+  image.write(argv[1]);
 }
 
