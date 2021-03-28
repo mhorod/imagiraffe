@@ -41,8 +41,8 @@ int main(int argc, char* argv[])
   PatternProperties properties = {
       {WIDTH, HEIGHT},
       0.25,
-      AngolanGiraffe::default_colors,
-      AngolanGiraffe::default_patches};
+      ReticulatedGiraffe::default_colors,
+      ReticulatedGiraffe::default_patches};
 
   auto point_generator = BasicPointGenerator(
       {properties.size.width, properties.size.height},

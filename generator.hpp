@@ -28,7 +28,7 @@ struct GiraffeColors
 
 struct GiraffePatches
 {
-  int gap_size;
+  double gap_size;
 
   double min_to_max_size_ratio;
 
@@ -38,6 +38,10 @@ struct GiraffePatches
   double patch_roughness;
 
   double rounded_corners_strength;
+
+  double spike_frequency;
+  double spike_threshold;
+  double spike_strength;
 };
 
 class GiraffeGenerator

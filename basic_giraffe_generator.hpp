@@ -38,6 +38,7 @@ private:
   double patch_distortion_at(Point) const;
   double secondary_tint_at(Point) const;
   double patch_roughness_at(Point) const;
+  double edge_distortion_at(Point point, Point patch_center) const;
   Color shade_at(Point, Color) const;
 };
 

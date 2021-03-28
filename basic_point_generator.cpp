@@ -23,8 +23,8 @@ std::vector<Point> BasicPointGenerator::generate_points(
   int max_radius = chunk_size * sqrt(2) / 2;
   int min_radius = sqrt(min_to_max_size_ratio) * max_radius;
 
-  int max_chunk_x = area_size.width / chunk_size + 2;
-  int max_chunk_y = area_size.height / chunk_size + 2;
+  int max_chunk_x = area_size.width / chunk_size + 4;
+  int max_chunk_y = area_size.height / chunk_size + 4;
 
   std::vector<int> radii;
   std::vector<Point> points;
@@ -43,8 +43,8 @@ std::vector<Point> BasicPointGenerator::generate_points(
       if (!used_chunks.contains({chunk.x, chunk.y})) break;
     }
 
-    chunk.x -= 1;
-    chunk.y -= 1;
+    chunk.x -= 2;
+    chunk.y -= 2;
     for (int _ = 0; _ < attempts; _++)
     {
       auto point = random_point({chunk_size, chunk_size});

@@ -13,7 +13,7 @@ struct ReticulatedGiraffe
   };
 
   static constexpr GiraffePatches default_patches = {
-      10, 1,
+      50, 1,
 
       16, 5, 6,
 
@@ -24,10 +24,18 @@ struct ReticulatedGiraffe
 struct WestAfricanGiraffe
 {
   static constexpr GiraffeColors default_colors = {
-      {188, 147, 86},
-      {241, 225, 177},
-      {89, 54, 39},
-      {80, 40, 20},
+      {200, 160, 100},
+      {241, 225, 203},
+      {178, 132, 79},
+      {124, 86, 51},
+  };
+
+  static constexpr GiraffePatches default_patches = {
+      20, 0.7,
+
+      16, 5,   6,
+
+      5,
   };
 };
 
@@ -39,15 +47,31 @@ struct NubianGiraffe
       {130, 84, 50},
       {154, 114, 74},
   };
+
+  static constexpr GiraffePatches default_patches = {
+      15, 0.5,
+
+      4,  8,   6,
+
+      5,
+  };
 };
 
 struct KordofanGiraffe
 {
   static constexpr GiraffeColors default_colors = {
-      {162, 133, 93},
+      {175, 140, 110},
       {255, 252, 215},
-      {77, 58, 44},
+      {75, 58, 42},
       {97, 70, 43},
+  };
+
+  static constexpr GiraffePatches default_patches = {
+      15, 0.5,
+
+      3,  16,  10,
+
+      2,
   };
 };
 
@@ -61,11 +85,13 @@ struct AngolanGiraffe
   };
 
   static constexpr GiraffePatches default_patches = {
-      20, 0.75,
+      30, 0.75,
 
-      15, 16,   5,
+      15, 16,   0.8,
 
       3,
+
+      2,  -0.4, 30,
   };
 };
 
