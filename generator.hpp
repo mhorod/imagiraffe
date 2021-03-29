@@ -10,7 +10,7 @@ struct Color
 
 struct Size
 {
-  unsigned width, height;
+  unsigned long width, height;
 };
 
 struct Point
@@ -26,28 +26,38 @@ struct GiraffeColors
   Color secondary_tint;
 };
 
-struct GiraffePatches
+struct PatchSize
 {
-  double gap_size;
-
-  double min_to_max_size_ratio;
-
-  double patch_distortion_frequency;
-  double patch_distortion_strength;
-
-  double patch_roughness;
-
-  double rounded_corners_strength;
-
-  double spike_frequency;
-  double spike_threshold;
-  double spike_strength;
+  double min_gap, max_gap;
+  double min_to_max_ratio;
+  double standard_deviation;
 };
 
-class GiraffeGenerator
+struct PatchSpikes
 {
-public:
-  virtual Color color_at(Point) const = 0;
+  double frequency;
+  double threshold;
+  double strength;
+};
+
+struct PatchEdge
+{
+  double distortion_frequency;
+  double distortion_strength;
+  double distortion_octaves;
+
+  double roughness_frequency;
+  double roughness_strength;
+  double roughness_octaves;
+
+  double roundness;
+};
+
+struct GiraffePatches
+{
+  PatchSize size;
+  PatchEdge edge;
+  PatchSpikes spikes;
 };
 
 struct PatternProperties
@@ -56,6 +66,12 @@ struct PatternProperties
   double scale;
   GiraffeColors colors;
   GiraffePatches patches;
+};
+
+class GiraffeGenerator
+{
+public:
+  virtual Color color_at(Point) const = 0;
 };
 
 class PointGenerator

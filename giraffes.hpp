@@ -3,96 +3,84 @@
 
 #include "generator.hpp"
 
-struct ReticulatedGiraffe
+struct GiraffeDefaults
 {
-  static constexpr GiraffeColors default_colors = {
-      {128, 69, 49},
-      {230, 210, 190},
-      {128, 69, 49},
-      {128, 69, 69},
-  };
-
-  static constexpr GiraffePatches default_patches = {
-      50, 1,
-
-      16, 5, 6,
-
-      5,
-  };
+  GiraffeColors default_colors;
+  GiraffePatches default_patches;
 };
 
-struct WestAfricanGiraffe
-{
-  static constexpr GiraffeColors default_colors = {
-      {200, 160, 100},
-      {241, 225, 203},
-      {178, 132, 79},
-      {124, 86, 51},
-  };
-
-  static constexpr GiraffePatches default_patches = {
-      20, 0.7,
-
-      16, 5,   6,
-
-      5,
-  };
+const GiraffeDefaults ReticulatedGiraffe = {
+    {
+        {128, 69, 49},
+        {215, 210, 190},
+        {105, 50, 30},
+        {130, 70, 50},
+    },
+    {
+        {5, 5, 0.8, 2},
+        {1, 5, 1, 4, 2.5, 5},
+        {0, 0, 0},
+    },
 };
 
-struct NubianGiraffe
-{
-  static constexpr GiraffeColors default_colors = {
-      {191, 150, 94},
-      {255, 252, 215},
-      {130, 84, 50},
-      {154, 114, 74},
-  };
+const GiraffeDefaults WestAfricanGiraffe{
+    {
+        {200, 160, 100},
+        {230, 225, 203},
+        {142, 99, 56},
+        {124, 86, 51},
+    },
 
-  static constexpr GiraffePatches default_patches = {
-      15, 0.5,
-
-      4,  8,   6,
-
-      5,
-  };
+    {
+        {10, 10, 1, 2},
+        {0.2, 6, 2, 4, 2.5, 4},
+        {0, 0, 0},
+    },
 };
 
-struct KordofanGiraffe
-{
-  static constexpr GiraffeColors default_colors = {
-      {175, 140, 110},
-      {255, 252, 215},
-      {75, 58, 42},
-      {97, 70, 43},
-  };
+const GiraffeDefaults NubianGiraffe = {
+    {
+        {191, 150, 94},
+        {255, 252, 215},
+        {110, 74, 40},
+        {154, 114, 74},
+    },
 
-  static constexpr GiraffePatches default_patches = {
-      15, 0.5,
-
-      3,  16,  10,
-
-      2,
-  };
+    {
+        {2, 20, 0.2, 10},
+        {2, 8, 2, 5, 1, 5},
+        {0, 0, 0},
+    },
 };
 
-struct AngolanGiraffe
-{
-  static constexpr GiraffeColors default_colors = {
-      {162, 127, 83},
-      {219, 200, 170},
-      {79, 44, 15},
-      {112, 75, 38},
-  };
+const GiraffeDefaults KordofanGiraffe = {
+    {
+        {190, 140, 85},
+        {255, 252, 215},
+        {82, 60, 40},
+        {142, 113, 75},
+    },
 
-  static constexpr GiraffePatches default_patches = {
-      30, 0.75,
+    {
+        {8, 20, 0.2, 20},
+        {0.75, 20, 6, 4, 2, 8},
+        {0, 0, 0},
+    },
+};
 
-      15, 16,   0.8,
+const GiraffeDefaults AngolanGiraffe = {
+    {
+        {162, 127, 83},
+        {209, 205, 170},
+        {60, 31, 15},
+        {112, 75, 38},
+    },
 
-      3,
-
-      2,  -0.4, 30,
-  };
+    {
+        {8, 20, 0.2, 20},
+        {0.75, 20, 6, 4, 2, 8},
+        {0, 0, 0},
+    },
 };
 
 #endif

@@ -2,9 +2,9 @@
 
 #include <iostream>
 
-double logistic(double x) { return 1 / (1 + pow((0.75 - x) / x, 3)); }
+double logistic(double x) { return 1 / (1 + pow((0.75 - x) / x, 2)); }
 
-const int DEFAULT_PATCH_COUNT = 30;
+const int DEFAULT_PATCH_COUNT = 40;
 
 std::vector<Point> BasicGiraffeGenerator::generate_points(
     const PatternProperties& properties, const PointGenerator& generator)
@@ -18,13 +18,20 @@ std::vector<Point> BasicGiraffeGenerator::generate_points(
 
 Color mix_with(Color, Color, double first_amount);
 
+// Calculates the distance of p from bisector of ab
+double distance_from_bisector(Point a, Point b, Point p)
+{
+  auto d1 = distance(a, p);
+  auto d2 = distance(b, p);
+  auto d = distance(a, b);
+
+  double v = d1 * d1 - d2 * d2;
+  return fabs(v / (2 * d));
+}
+
 Color BasicGiraffeGenerator::color_at(Point p) const
 {
-  auto scale = properties.scale;
-  double fx = scale * properties.size.width /
-              properties.patches.patch_distortion_frequency;
-  double fy = scale * properties.size.height /
-              properties.patches.patch_distortion_frequency;
+  auto scale = sqrt(properties.scale);
 
   std::vector<std::pair<double, int>> dst_pairs(patch_points.size());
   std::vector<double> dst(patch_points.size());
@@ -41,91 +48,99 @@ Color BasicGiraffeGenerator::color_at(Point p) const
 
   auto p1 = patch_points[dst_indices[0]];
   auto p2 = patch_points[dst_indices[1]];
+  auto p3 = patch_points[dst_indices[2]];
 
-  double v = pow(dst[1], 2) - pow(dst[0], 2);
-  double d = sqrt(pow(p1.x - p2.x, 2) + pow(p1.y - p2.y, 2));
-  double b = (d + v / d) / 2;
-  double gap = 2 * b - d;
+  auto d1 = distance_from_bisector(p1, p2, p);
+  auto d2 = distance_from_bisector(p1, p3, p);
 
-  auto patch_distortion = patch_distortion_at(p);
-  if (patch_distortion < 0) patch_distortion = 0;
-  auto patch_roughness = patch_roughness_at(p);
+  auto d = fmin(d1, d2);
+  double gap = gap_between_points(p1, p2);
+  double gap2 = gap_between_points(p1, p3);
 
-  auto edge_distortion = edge_distortion_at(p, patch_points[dst_indices[0]]);
+  double g1 = gap * scale;
+  double g2 = gap2 * scale;
 
-  double d1 = dst[1] - dst[0];
-  double d2 = dst[2] - dst[1];
+  gap += edge_distortion_at(p, p1);
+  gap2 += edge_distortion_at(p, p1);
 
-  double gap_size =
-      properties.patches.gap_size + edge_distortion - patch_distortion;
-  double gap_smooth = properties.patches.rounded_corners_strength / (d2 + 1);
+  gap *= scale;
+  gap2 *= scale;
 
-  auto r = dst[0] / (dst[0] + dst[1]);
-  auto r2 = r + patch_roughness;
+  int c = 128 + 5 * edge_distortion_at(p, p1);
+
+  double mix1 = (gap - d1 + 1) / 2;
+  double mix2 = (gap2 - d2 + 1) / 2;
+  bool m1 = mix1 > 0 && mix1 < 1 && d2 >= gap2;
+  bool m2 = mix2 > 0 && mix2 < 1 && d1 >= gap;
+  bool on_edge = m1 | m2;
+  double mix = 0;
+  if (m1) mix = mix1;
+  if (m2) mix = mix2;
 
   Color color;
-  if (gap * patch_roughness + gap_smooth < scale * gap_size)
+
+  if (d1 < gap || d2 < gap2)
   {
     color = properties.colors.gap;
+    if (on_edge) color = mix_with(color, properties.colors.patch, mix);
   }
   else
   {
+    double r = (dst[0] / (dst[0] + dst[1]));
     r = logistic(r);
-    color = mix_with(
-        properties.colors.patch, properties.colors.secondary_tint,
-        secondary_tint_at(p));
+    color = properties.colors.patch;
     color = mix_with(color, properties.colors.middle_tint, r);
+    color =
+        mix_with(color, properties.colors.secondary_tint, secondary_tint_at(p));
+    if (on_edge) color = mix_with(color, properties.colors.gap, 1 - mix);
+    color = shade_at(p, color);
   }
-
-  return shade_at(p, color);
+  return color;
 }
 
-double BasicGiraffeGenerator::patch_distortion_at(Point p) const
+double BasicGiraffeGenerator::gap_between_points(Point a, Point b) const
 {
-  auto scale = properties.scale;
-  double fx = scale * properties.size.width /
-              properties.patches.patch_distortion_frequency;
-  double fy = scale * properties.size.height /
-              properties.patches.patch_distortion_frequency;
-  auto patch_distortion = patch_distortion_noise.accumulatedOctaveNoise2D_0_1(
-      p.x / fx, p.y / fy, 3);
+  double noise = patch_roughness_noise.accumulatedOctaveNoise2D_0_1(
+      a.x / 16.0, b.y / 16.0, 10);
 
-  patch_distortion = (patch_distortion - 0.5) * 2;
-  patch_distortion *= properties.patches.patch_distortion_strength;
-  return patch_distortion;
+  noise = sin((double)a.x * b.y / a.y * b.x) * 0.5 + 0.5;
+  return 0.5 * noise *
+             (properties.patches.size.max_gap -
+              properties.patches.size.min_gap) +
+         properties.patches.size.min_gap;
 }
+
+double BasicGiraffeGenerator::patch_distortion_at(Point p) const { return 0; }
 
 double BasicGiraffeGenerator::secondary_tint_at(Point p) const
 {
-  auto secondary_tint =
-      secondary_tint_noise.accumulatedOctaveNoise2D_0_1(p.x, p.y, 8);
+  auto secondary_tint = secondary_tint_noise.accumulatedOctaveNoise2D_0_1(
+      p.x / 32.0, p.y / 32.0, 16);
   return secondary_tint;
 }
 
-double BasicGiraffeGenerator::patch_roughness_at(Point p) const
-{
-  auto scale = properties.scale;
-  auto patch_roughness = patch_roughness_noise.accumulatedOctaveNoise2D_0_1(
-      scale * p.x / 16, scale * p.y / 16, 8);
-
-  patch_roughness = 0.5 * patch_roughness + 0.5;
-  patch_roughness *= properties.patches.patch_roughness;
-  // patch_roughness = logistic(patch_roughness);
-  return patch_roughness;
-}
+double BasicGiraffeGenerator::patch_roughness_at(Point p) const { return 0; }
 
 double BasicGiraffeGenerator::edge_distortion_at(Point p, Point center) const
 {
   double angle = atan2(p.y - center.y, p.x - center.x);
-  double freq = properties.patches.spike_frequency;
+  double freq = properties.patches.edge.roughness_frequency;
   angle += center.x * center.y;
-  auto patch_roughness =
-      patch_roughness_noise.noise1D(angle * properties.patches.spike_frequency);
 
-  if (patch_roughness < properties.patches.spike_threshold)
-    patch_roughness *= properties.patches.spike_strength;
-  // patch_roughness = logistic(patch_roughness);
-  return patch_roughness;
+  auto roughness = patch_roughness_noise.accumulatedOctaveNoise1D(
+      angle * freq, properties.patches.edge.roughness_octaves);
+
+  freq = properties.patches.edge.distortion_frequency;
+  angle += center.x * center.y;
+  auto distortion = patch_roughness_noise.accumulatedOctaveNoise1D_0_1(
+      angle * freq, properties.patches.edge.distortion_octaves);
+
+  distortion -= 0.5;
+
+  distortion *= properties.patches.edge.distortion_strength;
+  roughness *= properties.patches.edge.roughness_strength;
+
+  return distortion + roughness;
 }
 
 Color mix_with(Color c1, Color c2, double first_amount)
