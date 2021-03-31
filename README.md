@@ -4,8 +4,11 @@ Giraffe generator made for Motorola Science Cup contest
 
 Project was created on Linux where configuration shouldn't cause much problems.
 
-
 # Usage
+
+## Requirements
+`python3` is required to run `run.py` script.
+There shouldn't be a problem with `main`, but `libpng` may be required.
 
 ## Running
 Use `run.py` script if you want to enter parameters manually.
@@ -13,7 +16,36 @@ You can also import the script and use a provided function to automate it.
 
 The other way is to write directly to stdin of `main`.
 
-See `examples` for more information
+## Examples
+There are two types of examples:
+- `*.py` - those are run with `python3 {example-file}`
+- `*.txt` - those are run with `./main < {example-file}`
+
+```
+basic_input.txt
+---
+giraffe - name of the file
+512 512 - width and height
+1 - scale
+0 - giraffe type (Reticulated giraffe)
+0 - skip colors customization
+0 - skip patches customization
+```
+
+```
+colored_giraffe.txt
+---
+colored_giraffe.png - name of the file
+512 512 - width and height
+2.0 - scale
+3 - giraffe type (Kordofan giraffe)
+1 - customize colors
+202 127 79 - patch color
+232 223 202 - gap color
+112 74 56 - middle color 
+237 208 144 - secondary color
+0 - skip patches customization
+```
 
 
 ## Format

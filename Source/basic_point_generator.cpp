@@ -36,6 +36,7 @@ std::pair<int, int> get_radii_bound(
 std::vector<Point> BasicPointGenerator::generate_points(
     size_t point_count) const
 {
+  if (point_count == 0) point_count = 1;
   int chunk_size = get_chunk_size(area(area_size), point_count);
   auto radii_bound = get_radii_bound(chunk_size, patch_size.min_to_max_ratio);
 
