@@ -4,56 +4,34 @@
 #include "generator.hpp"
 #include "giraffes.hpp"
 #include "png/png.hpp"
-
-struct Parameters
-{
-  std::string filename;
-  size_t giraffe;
-  size_t width, height;
-  double scale;
-};
-
-Parameters read_parameters()
-{
-  Parameters p;
-  std::cin >> p.filename;
-  std::cin >> p.giraffe;
-  std::cin >> p.width >> p.height;
-  std::cin >> p.scale;
-  return p;
-}
+#include "process_input.hpp"
 
 int main(int argc, char* argv[])
 {
+  srand(time(NULL));
   auto parameters = read_parameters();
 
-  srand(time(NULL));
-
-  const siv::PerlinNoise perlin(rand());
-  png::image<png::rgb_pixel> image(parameters.width, parameters.height);
-
   std::vector<GiraffeDefaults> giraffes = {
-      ReticulatedGiraffe, WestAfricanGiraffe, NubianGiraffe, KordofanGiraffe,
-      AngolanGiraffe};
+      ReticulatedGiraffe, WestAfricanGiraffe, NubianGiraffe,
+      KordofanGiraffe,    AngolanGiraffe,     SouthAfricanGiraffe,
+      RothschildGiraffe,  ThornicroftGiraffe, MasaiGiraffe};
+
+  if (!parameters.colors.has_value())
+    parameters.colors = giraffes[parameters.giraffe].default_colors;
+  if (!parameters.patches.has_value())
+    parameters.patches = giraffes[parameters.giraffe].default_patches;
 
   PatternProperties properties = {
       {parameters.width, parameters.height},
       parameters.scale,
-      giraffes[parameters.giraffe].default_colors,
-      giraffes[parameters.giraffe].default_patches};
+      parameters.colors.value(),
+      parameters.patches.value()};
 
   auto point_generator = BasicPointGenerator(
       {properties.size.width, properties.size.height}, properties.patches.size);
-
   auto generator = BasicGiraffeGenerator(properties, point_generator);
 
-  auto shade_noise = siv::PerlinNoise(rand());
-
-  double frequency = 8;
-  double octaves = 4;
-  double fx = parameters.width / frequency;
-  double fy = parameters.height / frequency;
-
+  png::image<png::rgb_pixel> image(parameters.width, parameters.height);
   for (size_t x = 0; x < parameters.width; x++)
     for (size_t y = 0; y < parameters.height; y++)
     {

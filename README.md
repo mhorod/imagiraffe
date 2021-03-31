@@ -4,16 +4,36 @@ Giraffe generator made for Motorola Science Cup contest
 
 ## Usage
 
-### Running
+## Running
 `python3` is required to run `run.py` script which is used to simplify
 user interface and putting information to `main`
 
 `main` reads data from stdin and generates a single image
 
-### Parameters
-Executing `python3 run.py [giraffe_index]` will generate
-a girafe of provided index. (0 for Reticulated, and so on)
+## Parameters
 
+Note: All parameters are in relation to 512x512 image.
+Image size 'crops' and has no effect on the pattern
+
+### Colors
+- patch - overall, average color of a patch
+- gap - space between the patches
+- middle - color deeper inside the patch, usually darker
+- secondary - adds some variation 
+
+### Patches
+Size
+- scale - scale of patch area - greater scale = bigger patches and fewer of them
+- (min/max) gap - how far apart the patches are
+- min to max area ratio - measure of how different in size the patches are
+- standard deviation - size is randomly selected with normal distribution
+
+Edges - created by adding noise to generated patches
+- distortion - controls bigger indents in the patch
+- roughness - more local than distortion and has weaker effect
+
+### Spikes
+under construction
 
 ## Code
 ### Requirements
@@ -89,3 +109,54 @@ Running `make` build `main` program.
 ![s4-7](images/4-7.png)
 ![s4-8](images/4-8.png)
 ![s4-9](images/4-9.png)
+
+## South African giraffe
+![s5-0](images/5-0.png)
+![s5-1](images/5-1.png)
+![s5-2](images/5-2.png)
+![s5-3](images/5-3.png)
+![s5-4](images/5-4.png)
+
+![s5-5](images/5-5.png)
+![s5-6](images/5-6.png)
+![s5-7](images/5-7.png)
+![s5-8](images/5-8.png)
+![s5-9](images/5-9.png)
+## Rothschild giraffe
+![s6-0](images/6-0.png)
+![s6-1](images/6-1.png)
+![s6-2](images/6-2.png)
+![s6-3](images/6-3.png)
+![s6-4](images/6-4.png)
+
+![s6-5](images/6-5.png)
+![s6-6](images/6-6.png)
+![s6-7](images/6-7.png)
+![s6-8](images/6-8.png)
+![s6-9](images/6-9.png)
+
+## Thornicroft giraffe
+![s7-0](images/7-0.png)
+![s7-1](images/7-1.png)
+![s7-2](images/7-2.png)
+![s7-3](images/7-3.png)
+![s7-4](images/7-4.png)
+
+![s7-5](images/7-5.png)
+![s7-6](images/7-6.png)
+![s7-7](images/7-7.png)
+![s7-8](images/7-8.png)
+![s7-9](images/7-9.png)
+
+## Masai giraffe
+![s8-0](images/8-0.png)
+![s8-1](images/8-1.png)
+![s8-2](images/8-2.png)
+![s8-3](images/8-3.png)
+![s8-4](images/8-4.png)
+
+![s8-5](images/8-5.png)
+![s8-6](images/8-6.png)
+![s8-7](images/8-7.png)
+![s8-8](images/8-8.png)
+![s8-9](images/8-9.png)

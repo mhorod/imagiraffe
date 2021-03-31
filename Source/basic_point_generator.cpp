@@ -6,6 +6,8 @@
 #include <set>
 #include <utility>
 
+#include "PerlinNoise.hpp"
+
 Point random_point(std::pair<int, int> size)
 {
   int x = rand() % size.first;
@@ -40,6 +42,7 @@ std::vector<Point> BasicPointGenerator::generate_points(
   int chunk_border = 1;  // How many extra chunks around the area
   int chunks_x = area_size.width / chunk_size + 2 * chunk_border;
   int chunks_y = area_size.height / chunk_size + 2 * chunk_border;
+
   point_count = chunks_x * chunks_y;
 
   std::vector<int> radii;
@@ -50,11 +53,16 @@ std::vector<Point> BasicPointGenerator::generate_points(
     for (int y = -chunk_border; y <= chunks_x - chunk_border; y++)
       free_chunks.insert({x, y});
 
+  // Add some randomness to points
   std::random_device rd{};
   std::mt19937 gen{rd()};
   std::normal_distribution<> rnd(
       (radii_bound.first + radii_bound.second) / 2.0,
       patch_size.standard_deviation);
+  siv::PerlinNoise offset_noise(rand());
+
+  int offset_x = rand() % (2 * chunk_size) - chunk_size;
+  int offset_y = rand() % (2 * chunk_size) - chunk_size;
 
   for (int i = 0; i < point_count; i++)
   {
@@ -65,12 +73,16 @@ std::vector<Point> BasicPointGenerator::generate_points(
     auto it = std::next(free_chunks.begin(), gen() % free_chunks.size());
     Point chunk = {it->first, it->second};
 
+    int offset = offset_noise.noise2D(
+                     1.0 * chunk.x / chunks_x, 1.0 * chunk.y / chunks_y) *
+                 chunk_size;
+
     for (int _ = 0; _ < attempts; _++)
     {
       // Choose random point in the middle of the chunk
       auto point = random_point({chunk_size / 2, chunk_size / 2});
-      point.x += chunk.x * chunk_size;
-      point.y += chunk.y * chunk_size;
+      point.x += chunk.x * chunk_size + offset + offset_x;
+      point.y += chunk.y * chunk_size + offset + offset_y;
       auto radius = rnd(gen);
       if (can_add_point(points, radii, point, radius))
       {

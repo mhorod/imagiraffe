@@ -1,6 +1,8 @@
 import os
 from PIL import Image
 import matplotlib.pyplot as plt
+import sys
+import run
 
 TOLERANCE = 200
 THRESHOLD = 500
@@ -39,7 +41,7 @@ def graph_data(data):
 data = []
 alldata = []
 for _ in range(20):
-    os.system('./main A.png')
+    run.run('A.png', sys.argv[1], 256, 256, 0.25)
     d = area_data('A.png')
     data.append(d[:3])
     alldata += d[3]

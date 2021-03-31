@@ -1,21 +1,15 @@
+// Interface that a generator should satisfy
 #ifndef GENERATOR_HPP
 #define GENERATOR_HPP
 
+#include <cmath>
 #include <vector>
+
+#include "geometry.hpp"
 
 struct Color
 {
   int r, g, b;
-};
-
-struct Size
-{
-  unsigned long width, height;
-};
-
-struct Point
-{
-  int x, y;
 };
 
 struct GiraffeColors
@@ -28,6 +22,7 @@ struct GiraffeColors
 
 struct PatchSize
 {
+  double scale;
   double min_gap, max_gap;
   double min_to_max_ratio;
   double standard_deviation;
@@ -35,9 +30,11 @@ struct PatchSize
 
 struct PatchSpikes
 {
-  double frequency;
-  double threshold;
-  double strength;
+  double chance;
+  double min_depth;
+  double max_depth;
+  int min_count;
+  int max_count;
 };
 
 struct PatchEdge
@@ -49,8 +46,6 @@ struct PatchEdge
   double roughness_frequency;
   double roughness_strength;
   double roughness_octaves;
-
-  double roundness;
 };
 
 struct GiraffePatches
@@ -79,8 +74,5 @@ class PointGenerator
 public:
   virtual std::vector<Point> generate_points(size_t point_count) const = 0;
 };
-
-int area(Size);
-double distance(Point, Point);
 
 #endif
