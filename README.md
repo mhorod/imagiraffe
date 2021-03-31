@@ -2,44 +2,69 @@
 
 Giraffe generator made for Motorola Science Cup contest
 
-## Usage
+Project was created on Linux where configuration shouldn't cause much problems.
+
+
+# Usage
 
 ## Running
-`python3` is required to run `run.py` script which is used to simplify
-user interface and putting information to `main`
+Use `run.py` script if you want to enter parameters manually.
+You can also import the script and use a provided function to automate it.
 
-`main` reads data from stdin and generates a single image
+The other way is to write directly to stdin of `main`.
 
-## Parameters
+See `examples` for more information
+
+
+## Format
+Generator (`main`) reads parameters from stdin in the following format:
+```
+{general parameters}
+0 | (1 {color parameters})
+0 | (1 {patch parameters})
+```
+
+## Parameter order 
 
 Note: All parameters are in relation to 512x512 image.
 Image size 'crops' and has no effect on the pattern
 
+### General
+- `filename {string}` - of result image
+- `width {uint}` - of result image
+- `height {uint}` - of result image
+- `scale {float}` - scales *area* of texture elements
+- `giraffe index {uint}` - number between 0 and 8 representing giraffe 
+
 ### Colors
-- patch - overall, average color of a patch
-- gap - space between the patches
-- middle - color deeper inside the patch, usually darker
-- secondary - adds some variation 
+- `patch {color}` - overall, average color of a patch
+- `gap {color}` - space between the patches
+- `middle {color}` - color deeper inside the patch, usually darker
+- `secondary {color}` - adds some variation 
 
 ### Patches
 Size
-- scale - scale of patch area - greater scale = bigger patches and fewer of them
-- (min/max) gap - how far apart the patches are
-- min to max area ratio - measure of how different in size the patches are
-- standard deviation - size is randomly selected with normal distribution
+- `scale {float}` - scale of patch area - greater scale = bigger patches and fewer of them
+- `(min and max) gap {float}` - how far apart the patches are
+- `min to max area ratio {float}` - measure of how different in size the patches are
+- `standard deviation {float}` - size is randomly selected with normal distribution
 
-Edges - created by adding noise to generated patches
-- distortion - controls bigger indents in the patch
-- roughness - more local than distortion and has weaker effect
+Edges - created by adding noise to generated patches.
+Each property has 3 values: `frequency {float}`,  `strength {float}`, `octaves {uint}`
+- `distortion` - controls bigger indents in the patch
+- `roughness` - more local than distortion and has weaker effect
 
 ### Spikes
-under construction
+- `(min and max) count {uint]` - how many spikes should a patch have
+- `(min and max) depth {float}` - how far into patch the spike extends
+- `(min and max) width {float}` - width (thickness) of the spike
 
 ## Code
 ### Requirements
   - `c++20 `
   - `libpng` and `libpng-config`
   - `python3` version `3.6+`
+  - optionally `Pillow` for `mosaic.py`
 
 Running `make` build `main` program.
 
@@ -160,3 +185,19 @@ Running `make` build `main` program.
 ![s8-7](images/8-7.png)
 ![s8-8](images/8-8.png)
 ![s8-9](images/8-9.png)
+
+
+## Mosaic
+![m](images/mosaic.png)
+
+## Elemental giraffes
+
+![blue-giraffe](images/elemental/water_giraffe.png)
+![green-giraffe](images/elemental/earth_giraffe.png)
+
+![fire-giraffe](images/elemental/fire_giraffe.png)
+![air-giraffe](images/elemental/air_giraffe.png)
+
+## Custom
+![custom-giraffe1](images/custom_giraffe1.png)
+![custom-giraffe2](images/custom_giraffe2.png)

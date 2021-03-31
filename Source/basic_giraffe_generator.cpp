@@ -54,15 +54,17 @@ BasicGiraffeGenerator::Patch BasicGiraffeGenerator::spiked_patch(
     Patch patch) const
 {
   std::default_random_engine rd;
-  rd.seed(rand());
+  rd.seed(rand() * patch.center.x * patch.center.y);
   std::mt19937 gen(rd());
 
   std::uniform_real_distribution<> dis(0, 1);
+
   int spike_count = properties.patches.spikes.min_count +
                     rand() % (properties.patches.spikes.max_count -
                               properties.patches.spikes.min_count + 1);
+
   double a = 2 * M_PI / spike_count;
-  double off = dis(rd);
+  double off = dis(rd) * M_PI;
   double scale = sqrt(properties.scale);
   for (int i = 0; i < spike_count; i++)
   {
@@ -85,12 +87,17 @@ BasicGiraffeGenerator::Patch BasicGiraffeGenerator::spiked_patch(
     double depth = dis(gen) * (properties.patches.spikes.max_depth -
                                properties.patches.spikes.min_depth) +
                    properties.patches.spikes.min_depth;
+    double width = dis(gen) * (properties.patches.spikes.max_width -
+                               properties.patches.spikes.min_width) +
+                   properties.patches.spikes.min_width;
 
-    depth *= sqrt(properties.scale);
-    depth = fmin(dst - scale * 10, depth);
+    depth += properties.patches.size.min_gap;
+    depth *= scale;
+    depth = fmin(depth, dst);
 
     Vector origin = {x - dx * depth, y - dy * depth};
     spike.origin = origin;
+    spike.width = width * scale;
 
     patch.spikes.push_back(spike);
   }
@@ -198,12 +205,12 @@ bool BasicGiraffeGenerator::inside_spike(
     const Patch& patch, const Spike& spike, Vector p) const
 {
   double scale = sqrt(properties.scale);
-  Vector v1 = p - patch.center;
-  Vector v2 = p - spike.origin;
+  Vector v1 = Vector(patch.center) - p;
+  Vector v2 = spike.origin - p;
   Vector v3 = spike.origin - patch.center;
 
   double d = fabs(cross(v1, v2)) / length(v3);
-  if (length(v1) < length(v3 * 2 - v1)) d = length(v2);
+  if (length(v1) < length(v2 + v3)) d = length(v2);
 
   d += noise.accumulatedOctaveNoise1D(scale * length(v2) / 10.0, 3) *
        properties.patches.edge.roughness_strength * scale;
@@ -211,7 +218,7 @@ bool BasicGiraffeGenerator::inside_spike(
   d += noise.accumulatedOctaveNoise1D(scale * length(v2) / 10.0, 3) * scale *
        1.5;
 
-  return d < 5 * scale;
+  return d < spike.width;
 }
 
 Color BasicGiraffeGenerator::patch_color_at(
@@ -280,6 +287,7 @@ double BasicGiraffeGenerator::secondary_tint_at(Vector p) const
 
 double BasicGiraffeGenerator::edge_distortion_at(Vector p, Point center) const
 {
+  double scale = sqrt(properties.scale);
   double angle = atan2(p.y - center.y, p.x - center.x);
   double freq = properties.patches.edge.roughness_frequency;
 
@@ -292,8 +300,8 @@ double BasicGiraffeGenerator::edge_distortion_at(Vector p, Point center) const
 
   distortion -= 0.5;
 
-  distortion *= properties.patches.edge.distortion_strength;
-  roughness *= properties.patches.edge.roughness_strength;
+  distortion *= properties.patches.edge.distortion_strength * scale;
+  roughness *= properties.patches.edge.roughness_strength * scale;
 
   return distortion + roughness;
 }
@@ -322,7 +330,7 @@ Color BasicGiraffeGenerator::shade_at(Vector p, Color c) const
   auto amount =
       noise.accumulatedOctaveNoise2D(scale * p.x / 16, scale * p.y / 16, 5);
 
-  amount = 1 + 0.25 * amount;
+  amount = 1 + 0.2 * amount;
   c.r *= amount;
   c.g *= amount;
   c.b *= amount;

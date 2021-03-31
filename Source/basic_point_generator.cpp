@@ -50,7 +50,7 @@ std::vector<Point> BasicPointGenerator::generate_points(
 
   std::set<std::pair<int, int>> free_chunks;
   for (int x = -chunk_border; x <= chunks_y - chunk_border; x++)
-    for (int y = -chunk_border; y <= chunks_x - chunk_border; y++)
+    for (int y = -chunk_border; y <= chunks_y - chunk_border; y++)
       free_chunks.insert({x, y});
 
   // Add some randomness to points

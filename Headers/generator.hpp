@@ -30,11 +30,14 @@ struct PatchSize
 
 struct PatchSpikes
 {
-  double chance;
-  double min_depth;
-  double max_depth;
   int min_count;
   int max_count;
+
+  double min_depth;
+  double max_depth;
+
+  double min_width;
+  double max_width;
 };
 
 struct PatchEdge

@@ -1,37 +1,18 @@
-from subprocess import Popen, PIPE
+# Run script used for capturing parameters from user
 import sys
+from generator import *
 
 MAX_IMAGE_SIZE = 1024
 
 
-def run(config_text):
-    print("Your giraffe is generating, please wait")
-    p = Popen(['./main'], stdout=PIPE, stdin=PIPE, stderr=PIPE)
-    out = p.communicate(input=bytes(config_text, "ascii"))[1]
+def run_by_user(params):
+    print("Your giraffe is being generated, please wait")
+    out = run(params.to_config_text())
     if out:
         print("An error occured")
         print(out.decode("ascii"))
     else:
         print("Your giraffe is ready")
-
-
-def run_args(filename, giraffe, width, height, scale):
-    config_text = f'''
-    {filename}
-    {giraffe}
-    {width}
-    {height}
-    {scale}
-    '''
-    run(config_text)
-
-
-def generate_sample_images():
-    for i in range(0, 9):
-        for j in range(0, 10):
-            scale = 1 / 16 * 2**(j % 5)
-            run_args(f'images/{i}-{j}.png', i, 128, 128, scale)
-            # print(f'![s{i}-{j}](images/{i}-{j}.png)')
 
 
 def ask_yes_no(question, default):
@@ -105,7 +86,7 @@ def load_configuration_from_user_input():
 
     filename = ask_until_valid("Enter result file name: ", lambda x: "")
 
-    return [filename, choice, width, height, scale, colors, patches]
+    return Parameters(filename, width, height, scale, choice, colors, patches)
 
 
 def is_valid_color(color):
@@ -170,7 +151,8 @@ def load_colors_from_user_input():
     secondary_color = parse_color(
         ask_until_valid("Secondary color: ", enter_color))
 
-    return patch_color, gap_color, middle_color, secondary_color
+    return ColorParameters(patch_color, gap_color, middle_color,
+                           secondary_color)
 
 
 def load_patches_from_user_input():
@@ -186,7 +168,7 @@ def load_patches_from_user_input():
     min_to_max_ratio = float(
         ask_until_valid("Min to max area ratio: ", enter_float))
     standard_deviation = float(
-        ask_until_valid("Standard deviation of patch size", enter_float))
+        ask_until_valid("Standard deviation of patch size: ", enter_float))
 
     print()
     print("Edges noise")
@@ -202,12 +184,29 @@ def load_patches_from_user_input():
         ask_until_valid("Roughness strength: ", enter_float))
     roughness_octaves = float(
         ask_until_valid("Roughness octaves: ", enter_float))
+    print()
+    print("Spikes")
+    min_count = int(
+        ask_until_valid("Minimum number of spikes: ",
+                        lambda x: enter_number(x, 0, 100)))
+    max_count = int(
+        ask_until_valid("Minimum number of spikes: ",
+                        lambda x: enter_number(x, 0, 100)))
+    min_depth = float(ask_until_valid("Minimum depth: ", enter_float))
+    max_depth = float(ask_until_valid("Maximum depth: ", enter_float))
+    min_width = float(ask_until_valid("Minimum width: ", enter_float))
+    max_width = float(ask_until_valid("Maximum width: ", enter_float))
 
-    return [
-        scale, min_gap, max_gap, min_to_max_ratio, standard_deviation,
-        distortion_frequency, distortion_strength, distortion_octaves,
-        roughness_frequency, roughness_strength, roughness_octaves
-    ]
+    return PatchParameters(
+        PatchSize(scale, min_gap, max_gap, min_to_max_ratio,
+                  standard_deviation),
+        PatchEdge(
+            NoiseParameters(distortion_frequency, distortion_strength,
+                            distortion_octaves),
+            NoiseParameters(roughness_frequency, roughness_strength,
+                            roughness_octaves)),
+        PatchSpikes(min_count, max_count, min_depth, max_depth, min_width,
+                    max_width))
 
 
 def generate_config_text(config):
@@ -234,8 +233,7 @@ def generate_config_text(config):
 
 if __name__ == '__main__':
     if len(sys.argv) == 1:
-        config = load_configuration_from_user_input()
-        config_text = generate_config_text(config)
-        print(config_text)
-        run(config_text)
-    #generate_sample_images()
+        params = load_configuration_from_user_input()
+        print("Data: ")
+        print(params.to_config_text())
+        run_by_user(params)

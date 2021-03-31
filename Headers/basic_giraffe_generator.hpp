@@ -15,7 +15,7 @@ class BasicGiraffeGenerator : public GiraffeGenerator
   struct Spike
   {
     Vector origin;
-    double angle;
+    double width;
   };
 
   struct Patch
